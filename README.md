@@ -1,5 +1,5 @@
 # network-crawler
-Python network scanner and an ARP spoofing script
+Python network scanner and an ARP spoofing script.
 
 Uses python3-scapy module for creating and sending ARP packets to the Network for the sake of Host discovery (nodes connected to the Network).
 
