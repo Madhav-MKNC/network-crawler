@@ -31,8 +31,8 @@ class Crawler:
         request = scapy.ARP(op='who-has',pdst=self.NETWORK_ADDRESS)
         broadcast = scapy.Ether(dst='ff:ff:ff:ff:ff:ff')
         response = scapy.srp(broadcast/request, timeout=1, verbose=ver)
-        self.alive_hosts = [[i.psrc,i.hwsrc.upper()] for i in response[0]]
-        self.all_hosts = [[i.psrc,i.hwsrc.upper()] for i in response[1]]+self.alive_hosts
+        self.alive_hosts = [[i[0].psrc,i[0].hwsrc.upper()] for i in response[0]]
+        self.all_hosts = [[i[0].psrc,i[0].hwsrc.upper()] for i in response[1]]+self.alive_hosts
         return self.alive_hosts
     
     def ARP_spoof(self,targetip='',spoofip=''):
@@ -58,14 +58,17 @@ if __name__ == "__main__":
     print("[*] Scanning the Network.....")
     crawler = Crawler(netaddr=gateway)
     crawler.scanNetwork(ver=ver)
-    print("+============================================+")
-    print("    HOSTS FOUND    \tMAC ADDRESS")
-    for host in crawler.alive_hosts:
-        print(f"    {host[0]}\t{host[1]}")
-    else:
+
+    if len(crawler.alive_hosts)==0:
         print("\n[-] No Online Host found")
         print("+============================================+")
-        print("    Other Hosts    \tMAC Address")
+        print("    All/Other Hosts\tMAC Address")
         for host in crawler.all_hosts:
             print(f"    {host[0]}\t{host[1]}")
+    else:
+        print("+============================================+")
+        print("    HOSTS FOUND    \tMAC ADDRESS")
+        for host in crawler.alive_hosts:
+            print(f"    {host[0]}\t{host[1]}")
+
     print()
