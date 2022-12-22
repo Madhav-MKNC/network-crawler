@@ -27,10 +27,10 @@ class Crawler:
     def __init__(self,netaddr=''):
         self.NETWORK_ADDRESS = netaddr
 
-    def scanNetwork(self):
+    def scanNetwork(self,ver=False):
         request = scapy.ARP(op='who-has',pdst=self.NETWORK_ADDRESS)
         broadcast = scapy.Ether(dst='ff:ff:ff:ff:ff:ff')
-        response = scapy.srp(broadcast/request, timeout=1, verbose=True)
+        response = scapy.srp(broadcast/request, timeout=1, verbose=ver)
         self.alive_hosts = [[i.psrc,i.hwsrc.upper()] for i in response[0]]
         self.all_hosts = [[i.psrc,i.hwsrc.upper()] for i in response[1]]+self.alive_hosts
         return self.alive_hosts
@@ -48,18 +48,24 @@ if __name__ == "__main__":
     time.sleep(1)
     print("[+] Default Gateway:",gateway)
     print("[+] Your hostname:",socket.gethostname())
-    print("[+] Your IP:",socket.gethostbyname(socket.gethostname()),"\n")
+    print("[+] Your IP:",socket.gethostbyname(socket.gethostname()))
+
+    ver = input("[=] Verbose Output? (y/n) ").lower()
+    if ver in ['yes','y']: ver = True
+    else: ver = False
     time.sleep(1)
+    
     print("[*] Scanning the Network.....")
     crawler = Crawler(netaddr=gateway)
-    crawler.scanNetwork()
-    print("+====================================+")
-    print("\tHOSTS FOUND\t\tMAC ADDRESS")
+    crawler.scanNetwork(ver=ver)
+    print("+============================================+")
+    print("    HOSTS FOUND    \tMAC ADDRESS")
     for host in crawler.alive_hosts:
-        print(f"\t{host[0]}\t\t{host[1]}")
+        print(f"    {host[0]}\t{host[1]}")
     else:
-        print("[-] No Online Host found")
-        print("\tOther Hosts\t\tMAC Address")
+        print("\n[-] No Online Host found")
+        print("+============================================+")
+        print("    Other Hosts    \tMAC Address")
         for host in crawler.all_hosts:
-            print(f"\t{host[0]}\t\t{host[1]}")
+            print(f"    {host[0]}\t{host[1]}")
     print()
